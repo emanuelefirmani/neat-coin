@@ -7,29 +7,14 @@ namespace NeatCoinTest
     public class LedgerTest
     {
         [Fact]
-        public void Ledger_contains_a_transaction()
-        {
-            var sut = Ledger
-                .Empty
-                .Append(new Transaction("from", "to", 42));
-
-            var actual = sut.GetTransaction();
-
-            actual
-                .Should()
-                .BeEquivalentTo(new Transaction("from", "to", 42));
-        }
-
-        [Fact]
         public void Can_compute_sender_balance()
         {
             var sut = Ledger
                 .Empty
-                .Append(new Transaction("from", "to", 42));
+                .Append(new Transaction("from", "to", 100))
+                .Append(new Transaction("to", "from", 20));
 
-            var actual = sut.Balance("from");
-
-            actual.Should().Be(-42);
+            sut.Balance("from").Should().Be(-80);
         }
         
         [Fact]
@@ -37,11 +22,12 @@ namespace NeatCoinTest
         {
             var sut = Ledger
                 .Empty
-                .Append(new Transaction("from", "to", 42));
+                .Append(new Transaction("from", "to", 100))
+                .Append(new Transaction("to", "from", 20));
 
             var actual = sut.Balance("to");
 
-            actual.Should().Be(42);
+            actual.Should().Be(80);
         }
 
         [Fact]
@@ -49,12 +35,12 @@ namespace NeatCoinTest
         {
             var sut = Ledger
                 .Empty
-                .Append(new Transaction("from", "to", 42));
+                .Append(new Transaction("from", "to", 100))
+                .Append(new Transaction("to", "from", 20));
 
             var actual = sut.Balance("unknown");
 
             actual.Should().Be(0);
         }
-
     }
 }

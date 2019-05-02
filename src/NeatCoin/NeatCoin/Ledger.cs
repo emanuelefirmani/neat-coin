@@ -1,23 +1,23 @@
-﻿namespace NeatCoin
+﻿using System.Collections.Immutable;
+using System.Linq;
+
+namespace NeatCoin
 {
     public class Ledger
     {
-        private readonly Transaction _transaction;
+        private readonly ImmutableList<Transaction> _transactions;
 
-        private Ledger(Transaction transaction)
+        private Ledger(ImmutableList<Transaction> transactions)
         {
-            _transaction = transaction;
+            _transactions = transactions;
         }
 
-        public static Ledger Empty => new Ledger(null);
+        public static Ledger Empty => new Ledger(ImmutableList.Create<Transaction>());
 
         public Ledger Append(Transaction transaction) =>
-            new Ledger(transaction);
-
-        public Transaction GetTransaction() =>
-            _transaction;
+            new Ledger(_transactions.Add(transaction));
 
         public int Balance(string account) => 
-            _transaction.Balance(account);
+            _transactions.Sum(x => x.Balance(account));
     }
 }

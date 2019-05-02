@@ -8,14 +8,16 @@ namespace NeatCoinTest
     {
         private static Ledger LedgerWithTransactions()
         {
+            var genesis = Page.Genesis("genesis")
+                .Append(new Transaction("from", "to", 100))
+                .Append(new Transaction("to", "from", 20));
+            var page2 = Page.GetEmpty("1", genesis.Hash)
+                .Append(new Transaction("from", "to", 10));
             var sut = Ledger.Empty
                 .Append(
-                    Page.Genesis("genesis")
-                        .Append(new Transaction("from", "to", 100))
-                        .Append(new Transaction("to", "from", 20)))
+                    genesis)
                 .Append(
-                    Page.GetEmpty("1", "genesis")
-                        .Append(new Transaction("from", "to", 10)));
+                    page2);
             return sut;
         }
 
@@ -68,53 +70,27 @@ namespace NeatCoinTest
                 .Append(
                     Page.Genesis("1")
                         .Append(new Transaction("from", "to", 10)))
-                
                 .Balance("to")
                 .Should().Be(0);
         }
-        
+
         [Fact]
         public void Ledger_accepts_a_tree_of_pages()
         {
+            var p1 = Page.Genesis("genesis")
+                .Append(new Transaction("from", "to", 100));
+            var p2 = Page.GetEmpty("1", p1.Hash)
+                .Append(new Transaction("from", "to", 10));
+            var p3 = Page.GetEmpty("2", p1.Hash)
+                .Append(new Transaction("from", "to", 1000));
+            var p4 = Page.GetEmpty("3", p1.Hash)
+                .Append(new Transaction("from", "to", 10000));
             Ledger.Empty
-                .Append(
-                    Page.Genesis("genesis")
-                        .Append(new Transaction("from", "to", 100)))
-                .Append(
-                    Page.GetEmpty("1", "genesis")
-                        .Append(new Transaction("from", "to", 10)))
-                .Append(
-                    Page.GetEmpty("2", "1")
-                        .Append(new Transaction("from", "to", 1000)))                
-                .Append(
-                    Page.GetEmpty("3", "1")
-                        .Append(new Transaction("from", "to", 10000)))
+                .Append(p1)
+                .Append(p2)
+                .Append(p3)
+                .Append(p4)
                 .Balance("to")
-                
-                .Should().Be(11110);
-        }
-
-        [Fact]
-        public void Ledger_accepts_a_tree_of_unsorted_pages()
-        {
-            Ledger.Empty
-                .Append(
-                    Page.GetEmpty("3", "1")
-                        .Append(new Transaction("from", "to", 10000)))
-                .Append(
-                    Page.GetEmpty("1", "genesis")
-                        .Append(new Transaction("from", "to", 10)))
-                .Append(
-                    Page.GetEmpty("1", "wrong")
-                        .Append(new Transaction("from", "to", 10)))
-                .Append(
-                    Page.Genesis("genesis")
-                        .Append(new Transaction("from", "to", 100)))
-                .Append(
-                    Page.GetEmpty("2", "1")
-                        .Append(new Transaction("from", "to", 1000)))                
-                .Balance("to")
-                
                 .Should().Be(11110);
         }
 
@@ -129,7 +105,6 @@ namespace NeatCoinTest
                     Page.GetEmpty("1", "unknown")
                         .Append(new Transaction("from", "to", 10)))
                 .Balance("to")
-                
                 .Should().Be(100);
         }
     }

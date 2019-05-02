@@ -12,5 +12,15 @@
             Receiver = receiver;
             Amount = amount;
         }
+
+        public int Balance(string account)
+        {
+            if (account == this.Sender)
+                return -this.Amount;
+            else if (account == this.Receiver)
+                return this.Amount;
+            else
+                return 0;
+        }
     }
 }

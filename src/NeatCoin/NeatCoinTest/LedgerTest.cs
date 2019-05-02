@@ -1,14 +1,24 @@
 ﻿using FluentAssertions;
 using Xunit;
+using NeatCoin;
 
 namespace NeatCoinTest
 {
-    public class DummyTest
+    public class LedgerTest
     {
         [Fact]
-        public void should_pass()
+        public void Ledger_contains_a_transaction()
         {
-            "friends".Should().Be("friends");
+            var sut = Ledger
+                .Empty
+                .Append(new Transaction("from", "to", 42));
+
+            var actual = sut.GetTransaction();
+
+            actual
+                .Should()
+                .BeEquivalentTo(new Transaction("from", "to", 42));
         }
+        
     }
 }
